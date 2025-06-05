@@ -329,10 +329,10 @@ i = urutan data
 n = jumlah data
 
 Berikut plot MAE dari model:
-![MAE](https://github.com/danielanputri/movie-recommender/blob/main/images/model_mae.png)
+- ![MAE](https://github.com/danielanputri/movie-recommender/blob/main/images/model_mae.png)
 
 Berikut plot RMSE dari model:
-![RMSE](https://github.com/danielanputri/movie-recommender/blob/main/images/model_rmse.png)
+- ![RMSE](https://github.com/danielanputri/movie-recommender/blob/main/images/model_rmse.png)
 
 **Evaluasi Terhadap Business Understanding**
 - Menjawab Problem Statement: Model yang dibuat berhasil menjawab problem statement dengan memberikan rekomendasi movie berdasarkan model yang ada. Pendekatan content-based filtering menggunakan model movie untuk memberikan rekomendasi yang relevan berdasarkan genre, sementara collaborative filtering memanfaatkan interaksi pengguna-item (rating) sebelumnya untuk menemukan pola preferensi pengguna.
