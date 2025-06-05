@@ -220,7 +220,7 @@ Hasil rekomendasi:
 Berdasarkan hasil rekomendasi tersebut dapat dilihat bahwa movie yang direkomendasikan memiliki genre yang mirip dengan input movienya.
 
 Hasil Content Based Filtering:
-![result](https://github.com/danielanputri/movie-recommender/blob/main/images/result-content-based.png)
+- ![result](https://github.com/danielanputri/movie-recommender/blob/main/images/result-content-based.png)
 
 #### Kelebihan dan Kekurangan Content-Based Filtering
 
@@ -300,7 +300,7 @@ Superbad (2007) : Comedy
 Everything Must Go (2010) : Comedy, Drama
 ```
 Hasil Collaborative Filtering:
-![result_collab](https://github.com/danielanputri/movie-recommender/blob/main/images/result-collaborative.png))
+- ![result_collab](https://github.com/danielanputri/movie-recommender/blob/main/images/result-collaborative.png))
 
 #### Kelebihan dan Kekurangan Content-Based Filtering
 
