@@ -59,7 +59,7 @@ Karena hal tersebut, mengetahui genre apa saja yang ada dalam dataframe tersebut
 
 ### Info Data rating.csv
 
-Dataset ini mengandung 100836 entri dan 3 kolom
+Dataset ini mengandung 100836 entri dan 4 kolom
 
 |   # | Column   | Dtype |
 | --: | -------- | ----- |
@@ -84,13 +84,13 @@ Variabel-variabel pada dataset adalah sebagai berikut:
 ---
 **Exploratory Data Analysis (EDA)**
 - Rating Plot
-  ![Rating Plot](https://github.com/danielanputri/recommenderSystem/blob/main/images/rating-plot.png)
+  ![rating-plot](https://github.com/danielanputri/recommenderSystem/blob/main/images/rating-plot.png)
   - Rating Paling Umum adalah 4.0: Frekuensi tertinggi ada pada skor rating 4.0.
   - Rating Tinggi Mendominasi: Skor rating 3.0, 3.5, 4.0, 4.5, dan 5.0 secara kolektif memiliki frekuensi yang jauh lebih tinggi dibandingkan skor rendah.
   - Skor di bawah 2.5 (terutama 0.5, 1.0, 1.5) memiliki frekuensi yang sangat rendah, mengindikasikan pengguna jarang memberikan penilaian sangat negatif.
     
 - Movie User Plot
-  ![Movie User Plot](https://github.com/danielanputri/recommenderSystem/blob/main/images/user-plot.png)
+  ![user-plot](https://github.com/danielanputri/recommenderSystem/blob/main/images/user-plot.png)
   - Terdapat perbedaan yang sangat signifikan antara jumlah movie (sekitar 9600-9800) dengan jumlah pengguna (sekitar 600-700) dalam dataset.
   - Plot menunjukkan ketidakseimbangan yang besar, di mana jumlah item (movie) yang tersedia jauh mendominasi jumlah pengguna yang ada.
 
@@ -151,9 +151,30 @@ List of all genre availabel:  ['Adventure' 'Animation' 'Children' 'Comedy' 'Fant
 #### 4. Split menjadi data train dan validasi.
 - Melakukan pemisahan pada dataframe menjadi train dan validasi dengan rasio 80:20, namun data diacak terlebih dahulu sebelum di pisah. Hal ini dilakukan supaya model dapat melakukan evaluasi pada data baru dan mencegah overfitting. Setelah diacak, fitur user dan movie dari dataframe rating diekstrasi. Lalu melakukan normalisasi min-max pada kolom 'rating' untuk mengubah nilainya ke dalam rentang 0 hingga 1.
 
+#### 5. TF-IDF Vectorizer
+Untuk merepresentasikan data kategori genre film ke dalam bentuk numerik yang dapat digunakan dalam perhitungan machine learning, dilakukan proses ekstraksi fitur berbasis teks menggunakan teknik TF-IDF Vectorizer (Term Frequency-Inverse Document Frequency). Teknik ini sangat umum digunakan dalam analisis teks untuk mengukur seberapa penting suatu kata (term) dalam suatu dokumen relatif terhadap kumpulan dokumen lainnya.
+
+```
+# Inisialisasi TF-IDF Vectorizer
+tfv = TfidfVectorizer()
+
+# Melatih TF-IDF berdasarkan genre film yang sudah digabung per baris (satu string per film)
+tfv.fit(data['genre_str'])
+
+# Menampilkan daftar fitur (kata unik dari seluruh genre)
+tfv.get_feature_names_out()
+
+# Transformasi teks menjadi matriks TF-IDF
+tfidf_matrix = tfv.fit_transform(data['genre_str'])
+
+# Ukuran matriks TF-IDF (baris = film, kolom = kata unik genre)
+tfidf_matrix.shape
+```
+- Input: data`[genre_str]` adalah kolom yang berisi genre-genre film yang telah digabungkan menjadi satu string, misalnya "Action Adventure Comedy".
+- Output: `tfidf_matrix` adalah matriks berdimensi (jumlah_film, jumlah_kata_unik_genre), di mana setiap sel menunjukkan skor TF-IDF dari suatu genre pada suatu film.
+
 ---
 ## Modeling
-Pada tahap ini akan membahas dua pendekatan utama yang digunakan dalam membangun sistem rekomendasi: Content-Based Filtering dan Collaborative Filtering. Berikut adalah penjelasan lebih lanjut mengenai parameter yang digunakan, kelebihan, dan kekurangan dari masing-masing pendekatan, serta beberapa potongan kode yang relevan.
 
 **Model Sistem Rekomendasi Content Based Filtering**
 
@@ -163,10 +184,7 @@ Parameter yang Digunakan:
   - TF-IDF Vectorizer: Untuk mengubah deskripsi teks menjadi vektor numerik.
   - Cosine Similarity: Untuk menghitung kesamaan antara vektor item.
 
-Formula untuk **Cosine Similarity** adalah:  
-$\displaystyle cos~(\theta) = \frac{A \cdot B}{\|A\| \|B\|}$
-
-Teknik ini menggunakan model **TF-IDF Vectorizer** untuk mendapatkan informasi mengenai genre yang terdapat di setiap movie dan diubah menjadi fitur yang dapat diukur kemiripannya. Contohnya adalah sebagai berikut
+Teknik ini menggunakan model **TF-IDF Vectorizer** yang berada di bagian data preparation untuk mendapatkan informasi mengenai genre yang terdapat di setiap movie dan diubah menjadi fitur yang dapat diukur kemiripannya. Contoh hasilnya adalah sebagai berikut
 | Title                                      | War | Drama    | Action | Documentary | Crime | Adventure | Fantasy  | Mystery | Fi       | Film |
 |--------------------------------------------|-----|----------|--------|-------------|-------|-----------|----------|---------|----------|------|
 | The Dark Tower (2017)                      | 0.0 | 0.000000 | 0.0    | 0.0         | 0.0   | 0.0       | 0.419398 | 0.0     | 0.392092 | 0.0  |
@@ -175,9 +193,18 @@ Teknik ini menggunakan model **TF-IDF Vectorizer** untuk mendapatkan informasi m
 | Mayor of the Sunset Strip (2003)           | 0.0 | 0.000000 | 0.0    | 1.0         | 0.0   | 0.0       | 0.000000 | 0.0     | 0.000000 | 0.0  |
 | Seven Year Itch, The (1955)                | 0.0 | 0.000000 | 0.0    | 0.0         | 0.0   | 0.0       | 0.000000 | 0.0     | 0.000000 | 0.0  |
 
-Pada baris dan kolom yang memiliki angka lebih dari 0 menunjukan genre yang ada pada movie tersebut.
+Setiap baris merepresentasikan satu film, sedangkan setiap kolom mewakili bobot genre tertentu. Matriks ini kemudian digunakan sebagai dasar untuk mengukur kemiripan antar film.
 
-Setelah itu **Cosine Similarity** akan diterapkan pada dataframe movie yang telah dibersihkan sehingga menghasilkan output sebagai berikut:
+Setelah representasi numerik dari genre diperoleh dalam bentuk matriks TF-IDF, tahap berikutnya adalah menghitung kemiripan antar film. Algoritma yang digunakan adalah **Cosine Similarity**, yaitu metode pengukuran kesamaan antar dua vektor berdasarkan sudut antar vektor tersebut.
+
+Formula untuk **Cosine Similarity** adalah:  
+$\displaystyle cos~(\theta) = \frac{A \cdot B}{\|A\| \|B\|}$
+
+Nilai cosine similarity berada pada rentang 0 hingga 1, di mana:
+- Nilai 1 berarti kedua film memiliki genre yang identik atau sangat mirip,
+- Nilai 0 berarti kedua film tidak memiliki kesamaan genre sama sekali.
+
+Berikut merupakan hasil penerapan **Cosine Similarity** pada dataframe, yang menghasilkan output sebagai berikut:
 | Title                             | Sitter, The (2011) | Great Yokai War, The (2005) | Austin Powers: The Spy Who Shagged Me (1999) | Eros (2004) | Navy Seals (1990) | Glen or Glenda (1953) | Over the Top (1987) | Incredible Journey, The (1963) | All the Real Girls (2003) | Bliss (2012) |
 |----------------------------------|---------------------|-----------------------------|----------------------------------------------|-------------|--------------------|-------------------------|----------------------|----------------------------------|----------------------------|--------------|
 | They Call Me Trinity (1971)      | 0.359701            | 0.116405                    | 0.156174                                     | 0.000000    | 0.000000           | 0.000000                | 0.000000             | 0.000000                         | 0.000000                   | 0.000000     |
@@ -191,7 +218,7 @@ Setelah itu **Cosine Similarity** akan diterapkan pada dataframe movie yang tela
 | Sibling Rivalry (1990)           | 1.000000            | 0.323615                    | 0.434179                                     | 0.000000    | 0.000000           | 0.000000                | 0.000000             | 0.000000                         | 0.000000                   | 0.000000     |
 | Assault on Precinct 13 (1976)    | 0.000000            | 0.000000                    | 0.423179                                     | 0.000000    | 0.324542           | 0.000000                | 0.590158             | 0.000000                         | 0.000000                   | 0.000000     |
 
-Di tabel tersebut dapat dilihat kecocokan dari 1 movie dengan yang lain. Nilai-nilai pada tabel tersebut merepresentasikan persentase kecocokan antara kedua movie tersebut.
+Dari tabel di tersebut, dapat disimpulkan bahwa "They Call Me Trinity (1971)" memiliki kemiripan sangat tinggi dengan "House Party 3 (1994)", ditunjukkan dengan nilai similarity sebesar 1.0. Nilai-nilai inilah yang menjadi dasar dalam sistem rekomendasi: ketika seorang pengguna menyukai satu film, sistem akan merekomendasikan film lain yang memiliki nilai kemiripan tertinggi berdasarkan hasil cosine similarity.
 
 Bagaimana Algoritma Bekerja:
 - Content-Based Filtering menggunakan model dari item itu sendiri untuk memberikan rekomendasi. Algoritma ini bekerja dengan cara mengubah fitur deskriptif item (model) menjadi representasi numerik menggunakan TF-IDF Vectorizer. Kemudian, cosine similarity dihitung untuk menentukan seberapa mirip item-item tersebut berdasarkan vektor fitur mereka. Berdasarkan kemiripan ini, sistem dapat merekomendasikan item yang paling mirip dengan item yang sudah disukai pengguna.
@@ -220,7 +247,7 @@ Hasil rekomendasi:
 Berdasarkan hasil rekomendasi tersebut dapat dilihat bahwa movie yang direkomendasikan memiliki genre yang mirip dengan input movienya.
 
 Hasil Content Based Filtering:
-- ![result](https://github.com/danielanputri/movie-recommender/blob/main/images/result-content-based.png)
+- ![result-content-based](https://github.com/danielanputri/movie-recommender/blob/main/images/result-content-based.png)
 
 #### Kelebihan dan Kekurangan Content-Based Filtering
 
@@ -300,7 +327,7 @@ Superbad (2007) : Comedy
 Everything Must Go (2010) : Comedy, Drama
 ```
 Hasil Collaborative Filtering:
-- ![result_collab](https://github.com/danielanputri/movie-recommender/blob/main/images/result-collaborative.png))
+- ![result_collaborative](https://github.com/danielanputri/movie-recommender/blob/main/images/result-collaborative.png))
 
 #### Kelebihan dan Kekurangan Content-Based Filtering
 
@@ -315,7 +342,54 @@ Hasil Collaborative Filtering:
 ## Evaluation
 Pada bagian ini, akan mengevaluasi model rekomendasi yang telah dibangun menggunakan metrik evaluasi yang tepat. Untuk model prediksi rating, kita akan menggunakan Mean Absolute Error (MAE) sebagai metrik evaluasi. Selain itu, akan mengevaluasi apakah proyek ini berhasil menjawab problem statement dan memberikan solusi yang diinginkan.
 
-**Metrik Evaluasi**
+
+### Evaluasi Content-Based Filtering
+
+Metrik evaluasi yang digunakan untuk **Content Based Filtering** adalah **Recall@K**.
+
+**Recall@K** adalah metrik yang mengukur proporsi dari item yang relevan di top-K dari keseluruhan item relevan di top-N rekomendasi.
+
+Formula dari Recall@K adalah:
+
+Recall@K = $\displaystyle \frac{\text{item yang relevan di top-K}}{\text{item yang relevan di top-N}}$
+
+Berikut analisa Recall@K untuk hasil rekomendasi **Content-Based Filtering**.
+
+Data untuk uji coba
+| # | title | genres |
+|--:|:------------------------------:|:--------------------------------:|
+| 0 | Avengers: Infinity War - Part I (2018). | [Action, Adventure, Sci-Fi] |
+
+Hasil rekomendasi:
+| title                                               | genres                        |
+|-----------------------------------------------------|-------------------------------|
+| Rocketeer, The (1991)                               | [Action, Adventure, Sci-Fi]  |
+| Ant-Man (2015)                                      | [Action, Adventure, Sci-Fi]  |
+| Time Machine, The (2002)                            | [Action, Adventure, Sci-Fi]  |
+| Iron Man (2008)                                     | [Action, Adventure, Sci-Fi]  |
+| Sky Captain and the World of Tomorrow (2004)        | [Action, Adventure, Sci-Fi]  |
+| Star Wars: Episode VI - Return of the Jedi (1983)   | [Action, Adventure, Sci-Fi]  |
+| Justice League (2017)                               | [Action, Adventure, Sci-Fi]  |
+| Farscape: The Peacekeeper Wars (2004)               | [Action, Adventure, Sci-Fi]  |
+| Power/Rangers (2015)                                | [Action, Adventure, Sci-Fi]  |
+| Black Panther (2017)                                | [Action, Adventure, Sci-Fi]  |
+
+Seperti di tabel, semua anime memiliki ketiga genre di data uji coba yaitu **"Action, Adventure, Sci-Fi"**. Hal ini menjadikan jumlah item yang relevan di top-N = 10. maka dapat disimpulkan juga untuk jumlah item di top-K akan selalu sama dengan K.
+
+Karena hasil rekomendasi relevan semua, maka:
+
+| K  | Item relevan di Top-K | Recall\@K         |
+| -- | --------------------- | ----------------- |
+| 1  | 1                     | 1 / 10 = **0.1**  |
+| 3  | 3                     | 3 / 10 = **0.3**  |
+| 5  | 5                     | 5 / 10 = **0.5**  |
+| 10 | 10                    | 10 / 10 = **1.0** |
+
+Dapat disimpulkan bahwa rekomendasi yang diberikan memiliki Recall@K sebesar 100%.
+
+
+#### Evaluasi Collaborative Filtering**
+Metrik evaluasi yang digunakan untuk **Collaborative Filtering** adalah **Mean Absolute Error (MAE)** dan **Root Mean Square Error (RMSE)**
 
 MAE atau Mean Absolute Error diterapkan dengan cara mengukur rata-rata dari selisih absolut antara prediksi dan nilai asli (y_asli - y_prediksi).
 
@@ -328,11 +402,25 @@ y = nilai aktual
 i = urutan data
 n = jumlah data
 
+Root Mean Square Error (RMSE) adalah ukuran yang digunakan untuk menilai seberapa baik model prediktif mendekati nilai aktual.
+$$
+\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}
+$$
+
+**Keterangan:**
+- \( \text{RMSE} \) : Root Mean Square Error  
+- \( y_i \) : Nilai aktual ke-i  
+- \( \hat{y}_i \) : Nilai prediksi ke-i  
+- \( n \) : Jumlah total data  
+- \( \sum \) : Penjumlahan dari data ke-1 hingga ke-n
+
+RMSE bernilai 0 jika prediksi model sempurna. Semakin kecil nilai RMSE, maka semakin baik performa model dalam melakukan prediksi.
+
 Berikut plot MAE dari model:
-- ![MAE](https://github.com/danielanputri/movie-recommender/blob/main/images/model_mae.png)
+- ![model_mae](https://github.com/danielanputri/movie-recommender/blob/main/images/model_mae.png)
 
 Berikut plot RMSE dari model:
-- ![RMSE](https://github.com/danielanputri/movie-recommender/blob/main/images/model_rmse.png)
+- ![model-rmse](https://github.com/danielanputri/movie-recommender/blob/main/images/model_rmse.png)
 
 **Evaluasi Terhadap Business Understanding**
 - Menjawab Problem Statement: Model yang dibuat berhasil menjawab problem statement dengan memberikan rekomendasi movie berdasarkan model yang ada. Pendekatan content-based filtering menggunakan model movie untuk memberikan rekomendasi yang relevan berdasarkan genre, sementara collaborative filtering memanfaatkan interaksi pengguna-item (rating) sebelumnya untuk menemukan pola preferensi pengguna.
