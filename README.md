@@ -107,7 +107,8 @@ Tahap data preparation dipisah menjai 2 yaitu untuk dataframe movie dan datafram
 - Mengubah list genre menjadi string.
 
 #### 1. Konversi genre dari setiap movie menjadi list.
-- Pada tahap ini genre dari setiap movie pada dataframe **movies.csv** akan diubah menjadi bentuk array (list) dan menghapus pipe (|). Hal ini dilakukan untuk mempermudah akses ke genre di kolom "genre". Hasilnya sebagai berikut
+Pada tahap ini genre dari setiap movie pada dataframe **movies.csv** akan diubah menjadi bentuk array (list) dan menghapus pipe (|). Hal ini dilakukan untuk mempermudah akses ke genre di kolom "genre". Hasilnya sebagai berikut:
+
 | movieId | title                   | genres                                           | genre_str                            |
 |---------|-------------------------|--------------------------------------------------|--------------------------------------|
 | 0       | Toy Story (1995)        | [Adventure, Animation, Children, Comedy, Fantasy]  | Adventure Animation Children Comedy Fantasy |
@@ -402,17 +403,19 @@ y = nilai aktual
 i = urutan data
 n = jumlah data
 
-Root Mean Square Error (RMSE) adalah ukuran yang digunakan untuk menilai seberapa baik model prediktif mendekati nilai aktual.
-$$
-\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}
-$$
+Root Mean Square Error (RMSE) adalah metrik yang digunakan untuk mengukur seberapa besar selisih (atau kesalahan) antara nilai yang diprediksi oleh sebuah model dengan nilai aktual. RMSE sangat populer karena memberikan bobot yang lebih besar pada kesalahan yang lebih besar.
+
+Rumus untuk menghitung RMSE adalah sebagai berikut:
+
+$$\text{RMSE} = \sqrt{\frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{n}}$$
 
 **Keterangan:**
-- \( \text{RMSE} \) : Root Mean Square Error  
-- \( y_i \) : Nilai aktual ke-i  
-- \( \hat{y}_i \) : Nilai prediksi ke-i  
-- \( n \) : Jumlah total data  
-- \( \sum \) : Penjumlahan dari data ke-1 hingga ke-n
+
+* $\text{RMSE}$ : Nilai *Root Mean Square Error*
+* $n$ : Jumlah total data
+* $y_i$ : Nilai aktual pada data ke-i
+* $\hat{y}_i$ : Nilai prediksi pada data ke-i
+* $\sum$ : Notasi sigma yang berarti penjumlahan semua selisih kuadrat dari i=1 hingga n
 
 RMSE bernilai 0 jika prediksi model sempurna. Semakin kecil nilai RMSE, maka semakin baik performa model dalam melakukan prediksi.
 
