@@ -370,9 +370,9 @@ Hasil rekomendasi:
 | Justice League (2017)                               | [Action, Adventure, Sci-Fi]  |
 | Ant-Man (2015)                                      | [Action, Adventure, Sci-Fi]  |
 
-Semua rekomendasi memiliki genre yang relevan (mengandung setidaknya satu genre yang sama dengan film input). Oleh karena itu, jumlah item relevan di top-5 adalah 5 dari 5 item yang direkomendasikan. Maka:
+Semua rekomendasi memiliki genre yang relevan (mengandung setidaknya satu genre yang sama dengan film input). Oleh karena itu, jumlah item relevan di top-5 adalah 5 dari 5 item yang direkomendasikan. Maka nilai dari Precision@K:
 
-Precision@K = $\displaystyle \frac{\text{Jumlah item yang relevan di top-K rekomendasi}}{K} = \frac{5}{5} = 1.00 \text{ atau } 100\%$
+Precision@K = $\displaystyle \frac{\text{Jumlah item yang relevan di top-K rekomendasi}}{K} = \frac{5}{5} = 1.00 \text{ atau } 100%$
 
 #### Evaluasi Collaborative Filtering**
 Metrik evaluasi yang digunakan untuk **Collaborative Filtering** adalah **Mean Absolute Error (MAE)** dan **Root Mean Square Error (RMSE)**
