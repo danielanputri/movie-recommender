@@ -59,7 +59,7 @@ Karena hal tersebut, mengetahui genre apa saja yang ada dalam dataframe tersebut
 
 ### Info Data rating.csv
 
-Dataset ini mengandung 100836 entri dan 3 kolom
+Dataset ini mengandung 100836 entri dan 4 kolom
 
 |   # | Column   | Dtype |
 | --: | -------- | ----- |
@@ -84,13 +84,13 @@ Variabel-variabel pada dataset adalah sebagai berikut:
 ---
 **Exploratory Data Analysis (EDA)**
 - Rating Plot
-  ![Rating Plot](https://github.com/danielanputri/recommenderSystem/blob/main/images/rating-plot.png)
+  - ![rating-plot](https://github.com/danielanputri/recommenderSystem/blob/main/images/rating-plot.png)
   - Rating Paling Umum adalah 4.0: Frekuensi tertinggi ada pada skor rating 4.0.
   - Rating Tinggi Mendominasi: Skor rating 3.0, 3.5, 4.0, 4.5, dan 5.0 secara kolektif memiliki frekuensi yang jauh lebih tinggi dibandingkan skor rendah.
   - Skor di bawah 2.5 (terutama 0.5, 1.0, 1.5) memiliki frekuensi yang sangat rendah, mengindikasikan pengguna jarang memberikan penilaian sangat negatif.
     
 - Movie User Plot
-  ![Movie User Plot](https://github.com/danielanputri/recommenderSystem/blob/main/images/user-plot.png)
+  - ![user-plot](https://github.com/danielanputri/recommenderSystem/blob/main/images/user-plot.png)
   - Terdapat perbedaan yang sangat signifikan antara jumlah movie (sekitar 9600-9800) dengan jumlah pengguna (sekitar 600-700) dalam dataset.
   - Plot menunjukkan ketidakseimbangan yang besar, di mana jumlah item (movie) yang tersedia jauh mendominasi jumlah pengguna yang ada.
 
@@ -107,7 +107,8 @@ Tahap data preparation dipisah menjai 2 yaitu untuk dataframe movie dan datafram
 - Mengubah list genre menjadi string.
 
 #### 1. Konversi genre dari setiap movie menjadi list.
-- Pada tahap ini genre dari setiap movie pada dataframe **movies.csv** akan diubah menjadi bentuk array (list) dan menghapus pipe (|). Hal ini dilakukan untuk mempermudah akses ke genre di kolom "genre". Hasilnya sebagai berikut
+Pada tahap ini genre dari setiap movie pada dataframe **movies.csv** akan diubah menjadi bentuk array (list) dan menghapus pipe (|). Hal ini dilakukan untuk mempermudah akses ke genre di kolom "genre". Hasilnya sebagai berikut:
+
 | movieId | title                   | genres                                           | genre_str                            |
 |---------|-------------------------|--------------------------------------------------|--------------------------------------|
 | 0       | Toy Story (1995)        | [Adventure, Animation, Children, Comedy, Fantasy]  | Adventure Animation Children Comedy Fantasy |
@@ -151,9 +152,30 @@ List of all genre availabel:  ['Adventure' 'Animation' 'Children' 'Comedy' 'Fant
 #### 4. Split menjadi data train dan validasi.
 - Melakukan pemisahan pada dataframe menjadi train dan validasi dengan rasio 80:20, namun data diacak terlebih dahulu sebelum di pisah. Hal ini dilakukan supaya model dapat melakukan evaluasi pada data baru dan mencegah overfitting. Setelah diacak, fitur user dan movie dari dataframe rating diekstrasi. Lalu melakukan normalisasi min-max pada kolom 'rating' untuk mengubah nilainya ke dalam rentang 0 hingga 1.
 
+#### 5. TF-IDF Vectorizer
+Untuk merepresentasikan data kategori genre film ke dalam bentuk numerik yang dapat digunakan dalam perhitungan machine learning, dilakukan proses ekstraksi fitur berbasis teks menggunakan teknik TF-IDF Vectorizer (Term Frequency-Inverse Document Frequency). Teknik ini sangat umum digunakan dalam analisis teks untuk mengukur seberapa penting suatu kata (term) dalam suatu dokumen relatif terhadap kumpulan dokumen lainnya.
+
+```
+# Inisialisasi TF-IDF Vectorizer
+tfv = TfidfVectorizer()
+
+# Melatih TF-IDF berdasarkan genre film yang sudah digabung per baris (satu string per film)
+tfv.fit(data['genre_str'])
+
+# Menampilkan daftar fitur (kata unik dari seluruh genre)
+tfv.get_feature_names_out()
+
+# Transformasi teks menjadi matriks TF-IDF
+tfidf_matrix = tfv.fit_transform(data['genre_str'])
+
+# Ukuran matriks TF-IDF (baris = film, kolom = kata unik genre)
+tfidf_matrix.shape
+```
+- Input: data`[genre_str]` adalah kolom yang berisi genre-genre film yang telah digabungkan menjadi satu string, misalnya "Action Adventure Comedy".
+- Output: `tfidf_matrix` adalah matriks berdimensi (jumlah_film, jumlah_kata_unik_genre), di mana setiap sel menunjukkan skor TF-IDF dari suatu genre pada suatu film.
+
 ---
 ## Modeling
-Pada tahap ini akan membahas dua pendekatan utama yang digunakan dalam membangun sistem rekomendasi: Content-Based Filtering dan Collaborative Filtering. Berikut adalah penjelasan lebih lanjut mengenai parameter yang digunakan, kelebihan, dan kekurangan dari masing-masing pendekatan, serta beberapa potongan kode yang relevan.
 
 **Model Sistem Rekomendasi Content Based Filtering**
 
@@ -163,35 +185,41 @@ Parameter yang Digunakan:
   - TF-IDF Vectorizer: Untuk mengubah deskripsi teks menjadi vektor numerik.
   - Cosine Similarity: Untuk menghitung kesamaan antara vektor item.
 
+Teknik ini menggunakan model **TF-IDF Vectorizer** yang berada di bagian data preparation untuk mendapatkan informasi mengenai genre yang terdapat di setiap movie dan diubah menjadi fitur yang dapat diukur kemiripannya. Contoh hasilnya adalah sebagai berikut:
+| Title                                          | Western | Comedy   | Sci     | Mystery | War | Documentary | Animation | Musical | IMAX | Noir |
+|-----------------------------------------------|---------|----------|---------|---------|-----|-------------|-----------|---------|------|------|
+| Naked (1993)                                   | 0.0     | 0.000000 | 0.000000| 0.0     | 0.0 | 0.0         | 0.0       | 0.0     | 0.0  | 0.0  |
+| Police Academy 2: Their First Assignment (1985)| 0.0     | 0.533483 | 0.000000| 0.0     | 0.0 | 0.0         | 0.0       | 0.0     | 0.0  | 0.0  |
+| Batman Returns (1992)                          | 0.0     | 0.000000 | 0.000000| 0.0     | 0.0 | 0.0         | 0.0       | 0.0     | 0.0  | 0.0  |
+| Defending Your Life (1991)                     | 0.0     | 0.373037 | 0.000000| 0.0     | 0.0 | 0.0         | 0.0       | 0.0     | 0.0  | 0.0  |
+| Doom (2005)                                    | 0.0     | 0.000000 | 0.522808| 0.0     | 0.0 | 0.0         | 0.0       | 0.0     | 0.0  | 0.0  |
+
+Setiap baris merepresentasikan satu film, sedangkan setiap kolom mewakili bobot genre tertentu. Matriks ini kemudian digunakan sebagai dasar untuk mengukur kemiripan antar film.
+
+Setelah representasi numerik dari genre diperoleh dalam bentuk matriks TF-IDF, tahap berikutnya adalah menghitung kemiripan antar film. Algoritma yang digunakan adalah **Cosine Similarity**, yaitu metode pengukuran kesamaan antar dua vektor berdasarkan sudut antar vektor tersebut.
+
 Formula untuk **Cosine Similarity** adalah:  
 $\displaystyle cos~(\theta) = \frac{A \cdot B}{\|A\| \|B\|}$
 
-Teknik ini menggunakan model **TF-IDF Vectorizer** untuk mendapatkan informasi mengenai genre yang terdapat di setiap movie dan diubah menjadi fitur yang dapat diukur kemiripannya. Contohnya adalah sebagai berikut
-| Title                                      | War | Drama    | Action | Documentary | Crime | Adventure | Fantasy  | Mystery | Fi       | Film |
-|--------------------------------------------|-----|----------|--------|-------------|-------|-----------|----------|---------|----------|------|
-| The Dark Tower (2017)                      | 0.0 | 0.000000 | 0.0    | 0.0         | 0.0   | 0.0       | 0.419398 | 0.0     | 0.392092 | 0.0  |
-| National Lampoon's Van Wilder (2002)       | 0.0 | 0.000000 | 0.0    | 0.0         | 0.0   | 0.0       | 0.000000 | 0.0     | 0.000000 | 0.0  |
-| Harold and Maude (1971)                    | 0.0 | 0.466216 | 0.0    | 0.0         | 0.0   | 0.0       | 0.000000 | 0.0     | 0.000000 | 0.0  |
-| Mayor of the Sunset Strip (2003)           | 0.0 | 0.000000 | 0.0    | 1.0         | 0.0   | 0.0       | 0.000000 | 0.0     | 0.000000 | 0.0  |
-| Seven Year Itch, The (1955)                | 0.0 | 0.000000 | 0.0    | 0.0         | 0.0   | 0.0       | 0.000000 | 0.0     | 0.000000 | 0.0  |
+Nilai cosine similarity berada pada rentang 0 hingga 1, di mana:
+- Nilai 1 berarti kedua film memiliki genre yang identik atau sangat mirip,
+- Nilai 0 berarti kedua film tidak memiliki kesamaan genre sama sekali.
 
-Pada baris dan kolom yang memiliki angka lebih dari 0 menunjukan genre yang ada pada movie tersebut.
+Berikut merupakan hasil penerapan **Cosine Similarity** pada dataframe, yang menghasilkan output sebagai berikut:
+| Title                                         | World's Fastest Indian, The (2005) | Philadelphia Experiment, The (1984) | Muppets From Space (1999) | Punisher, The (2004) | Breakfast Club, The (1985) | Invasion of the Body Snatchers (1956) | Believer, The (2001) | Rocket Singh: Salesman of the Year (2009) | Angst (1983) | Dragonslayer (1981) |
+|----------------------------------------------|-------------------------------------|--------------------------------------|----------------------------|------------------------|-----------------------------|----------------------------------------|-----------------------|-------------------------------------------|--------------|----------------------|
+| Sisterhood of the Traveling Pants, The (2005)| 0.446214                            | 0.529124                             | 0.226155                   | 0.000000               | 0.657734                    | 0.000000                               | 0.446214              | 0.657734                                  | 0.213968     | 0.426816             |
+| Twelve Monkeys (a.k.a. 12 Monkeys) (1995)    | 0.000000                            | 0.563911                             | 0.000000                   | 0.217017               | 0.000000                    | 0.692438                               | 0.000000              | 0.000000                                  | 0.000000     | 0.000000             |
+| Tampopo (1985)                                | 0.000000                            | 0.000000                             | 0.468011                   | 0.000000               | 0.734682                    | 0.000000                               | 0.000000              | 0.734682                                  | 0.000000     | 0.000000             |
+| Coriolanus (2011)                              | 0.564262                            | 0.173810                             | 0.000000                   | 0.447470               | 0.382802                    | 0.346130                               | 0.564262              | 0.382802                                  | 0.270574     | 0.000000             |
+| High and Low (Tengoku to jigoku) (1963)       | 0.195493                            | 0.060218                             | 0.000000                   | 0.368511               | 0.132625                    | 0.119919                               | 0.195493              | 0.132625                                  | 0.093742     | 0.000000             |
+| Seeker: The Dark Is Rising, The (2007)        | 0.318216                            | 0.377343                             | 0.000000                   | 0.259190               | 0.215882                    | 0.000000                               | 0.318216              | 0.215882                                  | 0.152590     | 0.948018             |
+| Hulk (2003)                                   | 0.000000                            | 0.857654                             | 0.000000                   | 0.237736               | 0.000000                    | 0.559491                               | 0.000000              | 0.000000                                  | 0.000000     | 0.494611             |
+| Alien: Covenant (2017)                        | 0.000000                            | 0.543434                             | 0.000000                   | 0.423940               | 0.000000                    | 0.920367                               | 0.000000              | 0.000000                                  | 0.423513     | 0.194642             |
+| Ride Along 2 (2016)                           | 0.000000                            | 0.000000                             | 0.276024                   | 0.443588               | 0.433301                    | 0.000000                               | 0.000000              | 0.433301                                  | 0.000000     | 0.401953             |
+| Spellbound (1945)                             | 0.000000                            | 0.000000                             | 0.000000                   | 0.263009               | 0.000000                    | 0.203445                               | 0.000000              | 0.000000                                  | 0.000000     | 0.000000             |
 
-Setelah itu **Cosine Similarity** akan diterapkan pada dataframe movie yang telah dibersihkan sehingga menghasilkan output sebagai berikut:
-| Title                             | Sitter, The (2011) | Great Yokai War, The (2005) | Austin Powers: The Spy Who Shagged Me (1999) | Eros (2004) | Navy Seals (1990) | Glen or Glenda (1953) | Over the Top (1987) | Incredible Journey, The (1963) | All the Real Girls (2003) | Bliss (2012) |
-|----------------------------------|---------------------|-----------------------------|----------------------------------------------|-------------|--------------------|-------------------------|----------------------|----------------------------------|----------------------------|--------------|
-| They Call Me Trinity (1971)      | 0.359701            | 0.116405                    | 0.156174                                     | 0.000000    | 0.000000           | 0.000000                | 0.000000             | 0.000000                         | 0.000000                   | 0.000000     |
-| Joe Gould's Secret (2000)        | 0.000000            | 0.000000                    | 0.000000                                     | 1.000000    | 0.000000           | 1.000000                | 0.559122             | 0.000000                         | 0.540111                   | 1.000000     |
-| Robin and Marian (1976)          | 0.000000            | 0.339874                    | 0.455992                                     | 0.399120    | 0.349708           | 0.399120                | 0.223157             | 0.428926                         | 0.738959                   | 0.399120     |
-| Portrait of a Lady, The (1996)   | 0.000000            | 0.000000                    | 0.000000                                     | 1.000000    | 0.000000           | 1.000000                | 0.559122             | 0.000000                         | 0.540111                   | 1.000000     |
-| Stop-Loss (2008)                 | 0.000000            | 0.000000                    | 0.000000                                     | 0.391360    | 0.665323           | 0.391360                | 0.218818             | 0.000000                         | 0.211378                   | 0.391360     |
-| Herbie Rides Again (1974)        | 0.317838            | 0.438499                    | 0.137998                                     | 0.000000    | 0.000000           | 0.000000                | 0.000000             | 0.462827                         | 0.384876                   | 0.000000     |
-| Curly Sue (1991)                 | 0.734682            | 0.237754                    | 0.318983                                     | 0.678412    | 0.000000           | 0.678412                | 0.379315             | 0.000000                         | 0.366418                   | 0.678412     |
-| House Party 3 (1994)             | 1.000000            | 0.323615                    | 0.434179                                     | 0.000000    | 0.000000           | 0.000000                | 0.000000             | 0.000000                         | 0.000000                   | 0.000000     |
-| Sibling Rivalry (1990)           | 1.000000            | 0.323615                    | 0.434179                                     | 0.000000    | 0.000000           | 0.000000                | 0.000000             | 0.000000                         | 0.000000                   | 0.000000     |
-| Assault on Precinct 13 (1976)    | 0.000000            | 0.000000                    | 0.423179                                     | 0.000000    | 0.324542           | 0.000000                | 0.590158             | 0.000000                         | 0.000000                   | 0.000000     |
-
-Di tabel tersebut dapat dilihat kecocokan dari 1 movie dengan yang lain. Nilai-nilai pada tabel tersebut merepresentasikan persentase kecocokan antara kedua movie tersebut.
+Dari tabel di tersebut, dapat disimpulkan bahwa "Seeker: The Dark Is Rising, The (2007)" memiliki kemiripan sangat tinggi dengan "	Dragonslayer (1981)", ditunjukkan dengan nilai similarity sebesar 0.948018. Nilai-nilai inilah yang menjadi dasar dalam sistem rekomendasi: ketika seorang pengguna menyukai satu film, sistem akan merekomendasikan film lain yang memiliki nilai kemiripan tertinggi berdasarkan hasil cosine similarity.
 
 Bagaimana Algoritma Bekerja:
 - Content-Based Filtering menggunakan model dari item itu sendiri untuk memberikan rekomendasi. Algoritma ini bekerja dengan cara mengubah fitur deskriptif item (model) menjadi representasi numerik menggunakan TF-IDF Vectorizer. Kemudian, cosine similarity dihitung untuk menentukan seberapa mirip item-item tersebut berdasarkan vektor fitur mereka. Berdasarkan kemiripan ini, sistem dapat merekomendasikan item yang paling mirip dengan item yang sudah disukai pengguna.
@@ -220,7 +248,7 @@ Hasil rekomendasi:
 Berdasarkan hasil rekomendasi tersebut dapat dilihat bahwa movie yang direkomendasikan memiliki genre yang mirip dengan input movienya.
 
 Hasil Content Based Filtering:
-- ![result](https://github.com/danielanputri/movie-recommender/blob/main/images/result-content-based.png)
+- ![result-content-based](https://github.com/danielanputri/movie-recommender/blob/main/images/result-content-based.png)
 
 #### Kelebihan dan Kekurangan Content-Based Filtering
 
@@ -272,15 +300,15 @@ Bagaimana Algoritma Bekerja:
 Pertama ambil dulu user secara acak dari dataframe rating. Kemudian tunjukkan movie yang telah dirating oleh user tersebut.
 
 ```
-Showing recommendations for user: 419
+Showing recommendations for user: 610
 ========================================
 Movie with high ratings from user
 ----------------------------------------
-Pulp Fiction (1994) : Comedy, Crime, Drama, Thriller
-Battle Royale 2: Requiem (Batoru rowaiaru II: Chinkonka) (2003) : Action, Drama, Thriller, War
-Prestige, The (2006) : Drama, Mystery, Sci-Fi, Thriller
-Paranormal Activity 2 (2010) : Horror, IMAX
-Louis Theroux: Law & Disorder (2008) : Documentary
+Heat (1995) : Action, Crime, Thriller
+Down by Law (1986) : Comedy, Drama, Film-Noir
+Suspiria (1977) : Horror
+Hot Fuzz (2007) : Action, Comedy, Crime, Mystery
+Avengers, The (2012) : Action, Adventure, Sci-Fi, IMAX
 ----------------------------------------
 ```
 Kemudian akan diambil semua movie yang belum dilihat oleh user, lalu model akan melakukan prediksi berdasarkan movie dengan rating tinggi oleh user dan kemiripannya dengan user lain. Hasilnya akan mendapatkan rekomendasi sebagai berikut
@@ -288,19 +316,19 @@ Kemudian akan diambil semua movie yang belum dilihat oleh user, lalu model akan 
 ```
 Top 10 movie recommendations
 ----------------------------------------
-Blade Runner (1982) : Action, Sci-Fi, Thriller
-Life Is Beautiful (La Vita è bella) (1997) : Comedy, Drama, Romance, War
-Runaway Train (1985) : Action, Adventure, Drama, Thriller
-Big Chill, The (1983) : Comedy, Drama
-Bug's Life, A (1998) : Adventure, Animation, Children, Comedy
-Central Station (Central do Brasil) (1998) : Drama
-Celebration, The (Festen) (1998) : Drama
-Others, The (2001) : Drama, Horror, Mystery, Thriller
-Superbad (2007) : Comedy
-Everything Must Go (2010) : Comedy, Drama
+It's a Wonderful Life (1946) : Children, Drama, Fantasy, Romance
+Right Stuff, The (1983) : Drama
+Boot, Das (Boat, The) (1981) : Action, Drama, War
+Sting, The (1973) : Comedy, Crime
+Manhattan (1979) : Comedy, Drama, Romance
+Dead Poets Society (1989) : Drama
+Touch of Evil (1958) : Crime, Film-Noir, Thriller
+Chinatown (1974) : Crime, Film-Noir, Mystery, Thriller
+Great Escape, The (1963) : Action, Adventure, Drama, War
+Deer Hunter, The (1978) : Drama, War
 ```
 Hasil Collaborative Filtering:
-- ![result_collab](https://github.com/danielanputri/movie-recommender/blob/main/images/result-collaborative.png))
+- ![result_collaborative](https://github.com/danielanputri/movie-recommender/blob/main/images/result-collaborative.png))
 
 #### Kelebihan dan Kekurangan Content-Based Filtering
 
@@ -315,7 +343,39 @@ Hasil Collaborative Filtering:
 ## Evaluation
 Pada bagian ini, akan mengevaluasi model rekomendasi yang telah dibangun menggunakan metrik evaluasi yang tepat. Untuk model prediksi rating, kita akan menggunakan Mean Absolute Error (MAE) sebagai metrik evaluasi. Selain itu, akan mengevaluasi apakah proyek ini berhasil menjawab problem statement dan memberikan solusi yang diinginkan.
 
-**Metrik Evaluasi**
+
+### Evaluasi Content-Based Filtering
+
+Metrik evaluasi yang digunakan untuk **Content Based Filtering** adalah **Precision@K**.
+
+Precision@K mengukur sejauh mana sistem memberikan rekomendasi yang relevan dalam K item teratas (top-K). Fokus dari metrik ini adalah menghindari item yang tidak relevan, sehingga cocok untuk sistem berbasis konten yang mengutamakan kesamaan karakteristik (seperti genre).
+
+Formula dari Precision@K adalah:
+
+Precision@K = $\displaystyle \frac{\text{Jumlah item yang relevan di top-K rekomendasi}}{\text{K}}$
+
+Berikut analisa Precision@K untuk hasil rekomendasi **Content-Based Filtering**.
+
+Data untuk uji coba
+| # | title | genres |
+|--:|:------------------------------:|:--------------------------------:|
+| 0 | Avengers: Infinity War - Part I (2018). | [Action, Adventure, Sci-Fi] |
+
+Hasil rekomendasi:
+| title                                               | genres                        |
+|-----------------------------------------------------|-------------------------------|
+| Rocketeer, The (1991)                               | [Action, Adventure, Sci-Fi]  |
+| Sky Captain and the World of Tomorrow (2004)        | [Action, Adventure, Sci-Fi]  |
+| Star Wars: Episode VI - Return of the Jedi (1983)   | [Action, Adventure, Sci-Fi]  |
+| Justice League (2017)                               | [Action, Adventure, Sci-Fi]  |
+| Ant-Man (2015)                                      | [Action, Adventure, Sci-Fi]  |
+
+Semua rekomendasi memiliki genre yang relevan (mengandung setidaknya satu genre yang sama dengan film input). Oleh karena itu, jumlah item relevan di top-5 adalah 5 dari 5 item yang direkomendasikan. Maka:
+
+Precision@K = $\displaystyle \frac{\text{Jumlah item yang relevan di top-K rekomendasi}}{K} = \frac{5}{5} = 1.00 \text{ atau } 100\%$
+
+#### Evaluasi Collaborative Filtering**
+Metrik evaluasi yang digunakan untuk **Collaborative Filtering** adalah **Mean Absolute Error (MAE)** dan **Root Mean Square Error (RMSE)**
 
 MAE atau Mean Absolute Error diterapkan dengan cara mengukur rata-rata dari selisih absolut antara prediksi dan nilai asli (y_asli - y_prediksi).
 
@@ -328,11 +388,27 @@ y = nilai aktual
 i = urutan data
 n = jumlah data
 
+Root Mean Square Error (RMSE) adalah metrik yang digunakan untuk mengukur seberapa besar selisih (atau kesalahan) antara nilai yang diprediksi oleh sebuah model dengan nilai aktual. RMSE sangat populer karena memberikan bobot yang lebih besar pada kesalahan yang lebih besar.
+
+Rumus untuk menghitung RMSE adalah sebagai berikut:
+
+$$\text{RMSE} = \sqrt{\frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{n}}$$
+
+**Keterangan:**
+
+* $\text{RMSE}$ : Nilai *Root Mean Square Error*
+* $n$ : Jumlah total data
+* $y_i$ : Nilai aktual pada data ke-i
+* $\hat{y}_i$ : Nilai prediksi pada data ke-i
+* $\sum$ : Notasi sigma yang berarti penjumlahan semua selisih kuadrat dari i=1 hingga n
+
+RMSE bernilai 0 jika prediksi model sempurna. Semakin kecil nilai RMSE, maka semakin baik performa model dalam melakukan prediksi.
+
 Berikut plot MAE dari model:
-- ![MAE](https://github.com/danielanputri/movie-recommender/blob/main/images/model_mae.png)
+- ![model_mae](https://github.com/danielanputri/movie-recommender/blob/main/images/model_mae.png)
 
 Berikut plot RMSE dari model:
-- ![RMSE](https://github.com/danielanputri/movie-recommender/blob/main/images/model_rmse.png)
+- ![model-rmse](https://github.com/danielanputri/movie-recommender/blob/main/images/model_rmse.png)
 
 **Evaluasi Terhadap Business Understanding**
 - Menjawab Problem Statement: Model yang dibuat berhasil menjawab problem statement dengan memberikan rekomendasi movie berdasarkan model yang ada. Pendekatan content-based filtering menggunakan model movie untuk memberikan rekomendasi yang relevan berdasarkan genre, sementara collaborative filtering memanfaatkan interaksi pengguna-item (rating) sebelumnya untuk menemukan pola preferensi pengguna.
