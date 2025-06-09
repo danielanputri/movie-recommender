@@ -84,13 +84,13 @@ Variabel-variabel pada dataset adalah sebagai berikut:
 ---
 **Exploratory Data Analysis (EDA)**
 - Rating Plot
-  ![rating-plot](https://github.com/danielanputri/recommenderSystem/blob/main/images/rating-plot.png)
+  - ![rating-plot](https://github.com/danielanputri/recommenderSystem/blob/main/images/rating-plot.png)
   - Rating Paling Umum adalah 4.0: Frekuensi tertinggi ada pada skor rating 4.0.
   - Rating Tinggi Mendominasi: Skor rating 3.0, 3.5, 4.0, 4.5, dan 5.0 secara kolektif memiliki frekuensi yang jauh lebih tinggi dibandingkan skor rendah.
   - Skor di bawah 2.5 (terutama 0.5, 1.0, 1.5) memiliki frekuensi yang sangat rendah, mengindikasikan pengguna jarang memberikan penilaian sangat negatif.
     
 - Movie User Plot
-  ![user-plot](https://github.com/danielanputri/recommenderSystem/blob/main/images/user-plot.png)
+  - ![user-plot](https://github.com/danielanputri/recommenderSystem/blob/main/images/user-plot.png)
   - Terdapat perbedaan yang sangat signifikan antara jumlah movie (sekitar 9600-9800) dengan jumlah pengguna (sekitar 600-700) dalam dataset.
   - Plot menunjukkan ketidakseimbangan yang besar, di mana jumlah item (movie) yang tersedia jauh mendominasi jumlah pengguna yang ada.
 
@@ -375,8 +375,6 @@ Precision@K =
 \[
 \frac{\text{Jumlah item yang relevan di top-K rekomendasi}}{K} = \frac{5}{5} = 1.00 \text{ atau } 100\%
 \]
-
-
 
 #### Evaluasi Collaborative Filtering**
 Metrik evaluasi yang digunakan untuk **Collaborative Filtering** adalah **Mean Absolute Error (MAE)** dan **Root Mean Square Error (RMSE)**
