@@ -185,14 +185,14 @@ Parameter yang Digunakan:
   - TF-IDF Vectorizer: Untuk mengubah deskripsi teks menjadi vektor numerik.
   - Cosine Similarity: Untuk menghitung kesamaan antara vektor item.
 
-Teknik ini menggunakan model **TF-IDF Vectorizer** yang berada di bagian data preparation untuk mendapatkan informasi mengenai genre yang terdapat di setiap movie dan diubah menjadi fitur yang dapat diukur kemiripannya. Contoh hasilnya adalah sebagai berikut
-| Title                                      | War | Drama    | Action | Documentary | Crime | Adventure | Fantasy  | Mystery | Fi       | Film |
-|--------------------------------------------|-----|----------|--------|-------------|-------|-----------|----------|---------|----------|------|
-| The Dark Tower (2017)                      | 0.0 | 0.000000 | 0.0    | 0.0         | 0.0   | 0.0       | 0.419398 | 0.0     | 0.392092 | 0.0  |
-| National Lampoon's Van Wilder (2002)       | 0.0 | 0.000000 | 0.0    | 0.0         | 0.0   | 0.0       | 0.000000 | 0.0     | 0.000000 | 0.0  |
-| Harold and Maude (1971)                    | 0.0 | 0.466216 | 0.0    | 0.0         | 0.0   | 0.0       | 0.000000 | 0.0     | 0.000000 | 0.0  |
-| Mayor of the Sunset Strip (2003)           | 0.0 | 0.000000 | 0.0    | 1.0         | 0.0   | 0.0       | 0.000000 | 0.0     | 0.000000 | 0.0  |
-| Seven Year Itch, The (1955)                | 0.0 | 0.000000 | 0.0    | 0.0         | 0.0   | 0.0       | 0.000000 | 0.0     | 0.000000 | 0.0  |
+Teknik ini menggunakan model **TF-IDF Vectorizer** yang berada di bagian data preparation untuk mendapatkan informasi mengenai genre yang terdapat di setiap movie dan diubah menjadi fitur yang dapat diukur kemiripannya. Contoh hasilnya adalah sebagai berikut:
+| Title                                          | Western | Comedy   | Sci     | Mystery | War | Documentary | Animation | Musical | IMAX | Noir |
+|-----------------------------------------------|---------|----------|---------|---------|-----|-------------|-----------|---------|------|------|
+| Naked (1993)                                   | 0.0     | 0.000000 | 0.000000| 0.0     | 0.0 | 0.0         | 0.0       | 0.0     | 0.0  | 0.0  |
+| Police Academy 2: Their First Assignment (1985)| 0.0     | 0.533483 | 0.000000| 0.0     | 0.0 | 0.0         | 0.0       | 0.0     | 0.0  | 0.0  |
+| Batman Returns (1992)                          | 0.0     | 0.000000 | 0.000000| 0.0     | 0.0 | 0.0         | 0.0       | 0.0     | 0.0  | 0.0  |
+| Defending Your Life (1991)                     | 0.0     | 0.373037 | 0.000000| 0.0     | 0.0 | 0.0         | 0.0       | 0.0     | 0.0  | 0.0  |
+| Doom (2005)                                    | 0.0     | 0.000000 | 0.522808| 0.0     | 0.0 | 0.0         | 0.0       | 0.0     | 0.0  | 0.0  |
 
 Setiap baris merepresentasikan satu film, sedangkan setiap kolom mewakili bobot genre tertentu. Matriks ini kemudian digunakan sebagai dasar untuk mengukur kemiripan antar film.
 
@@ -206,20 +206,20 @@ Nilai cosine similarity berada pada rentang 0 hingga 1, di mana:
 - Nilai 0 berarti kedua film tidak memiliki kesamaan genre sama sekali.
 
 Berikut merupakan hasil penerapan **Cosine Similarity** pada dataframe, yang menghasilkan output sebagai berikut:
-| Title                             | Sitter, The (2011) | Great Yokai War, The (2005) | Austin Powers: The Spy Who Shagged Me (1999) | Eros (2004) | Navy Seals (1990) | Glen or Glenda (1953) | Over the Top (1987) | Incredible Journey, The (1963) | All the Real Girls (2003) | Bliss (2012) |
-|----------------------------------|---------------------|-----------------------------|----------------------------------------------|-------------|--------------------|-------------------------|----------------------|----------------------------------|----------------------------|--------------|
-| They Call Me Trinity (1971)      | 0.359701            | 0.116405                    | 0.156174                                     | 0.000000    | 0.000000           | 0.000000                | 0.000000             | 0.000000                         | 0.000000                   | 0.000000     |
-| Joe Gould's Secret (2000)        | 0.000000            | 0.000000                    | 0.000000                                     | 1.000000    | 0.000000           | 1.000000                | 0.559122             | 0.000000                         | 0.540111                   | 1.000000     |
-| Robin and Marian (1976)          | 0.000000            | 0.339874                    | 0.455992                                     | 0.399120    | 0.349708           | 0.399120                | 0.223157             | 0.428926                         | 0.738959                   | 0.399120     |
-| Portrait of a Lady, The (1996)   | 0.000000            | 0.000000                    | 0.000000                                     | 1.000000    | 0.000000           | 1.000000                | 0.559122             | 0.000000                         | 0.540111                   | 1.000000     |
-| Stop-Loss (2008)                 | 0.000000            | 0.000000                    | 0.000000                                     | 0.391360    | 0.665323           | 0.391360                | 0.218818             | 0.000000                         | 0.211378                   | 0.391360     |
-| Herbie Rides Again (1974)        | 0.317838            | 0.438499                    | 0.137998                                     | 0.000000    | 0.000000           | 0.000000                | 0.000000             | 0.462827                         | 0.384876                   | 0.000000     |
-| Curly Sue (1991)                 | 0.734682            | 0.237754                    | 0.318983                                     | 0.678412    | 0.000000           | 0.678412                | 0.379315             | 0.000000                         | 0.366418                   | 0.678412     |
-| House Party 3 (1994)             | 1.000000            | 0.323615                    | 0.434179                                     | 0.000000    | 0.000000           | 0.000000                | 0.000000             | 0.000000                         | 0.000000                   | 0.000000     |
-| Sibling Rivalry (1990)           | 1.000000            | 0.323615                    | 0.434179                                     | 0.000000    | 0.000000           | 0.000000                | 0.000000             | 0.000000                         | 0.000000                   | 0.000000     |
-| Assault on Precinct 13 (1976)    | 0.000000            | 0.000000                    | 0.423179                                     | 0.000000    | 0.324542           | 0.000000                | 0.590158             | 0.000000                         | 0.000000                   | 0.000000     |
+| Title                                         | World's Fastest Indian, The (2005) | Philadelphia Experiment, The (1984) | Muppets From Space (1999) | Punisher, The (2004) | Breakfast Club, The (1985) | Invasion of the Body Snatchers (1956) | Believer, The (2001) | Rocket Singh: Salesman of the Year (2009) | Angst (1983) | Dragonslayer (1981) |
+|----------------------------------------------|-------------------------------------|--------------------------------------|----------------------------|------------------------|-----------------------------|----------------------------------------|-----------------------|-------------------------------------------|--------------|----------------------|
+| Sisterhood of the Traveling Pants, The (2005)| 0.446214                            | 0.529124                             | 0.226155                   | 0.000000               | 0.657734                    | 0.000000                               | 0.446214              | 0.657734                                  | 0.213968     | 0.426816             |
+| Twelve Monkeys (a.k.a. 12 Monkeys) (1995)    | 0.000000                            | 0.563911                             | 0.000000                   | 0.217017               | 0.000000                    | 0.692438                               | 0.000000              | 0.000000                                  | 0.000000     | 0.000000             |
+| Tampopo (1985)                                | 0.000000                            | 0.000000                             | 0.468011                   | 0.000000               | 0.734682                    | 0.000000                               | 0.000000              | 0.734682                                  | 0.000000     | 0.000000             |
+| Coriolanus (2011)                              | 0.564262                            | 0.173810                             | 0.000000                   | 0.447470               | 0.382802                    | 0.346130                               | 0.564262              | 0.382802                                  | 0.270574     | 0.000000             |
+| High and Low (Tengoku to jigoku) (1963)       | 0.195493                            | 0.060218                             | 0.000000                   | 0.368511               | 0.132625                    | 0.119919                               | 0.195493              | 0.132625                                  | 0.093742     | 0.000000             |
+| Seeker: The Dark Is Rising, The (2007)        | 0.318216                            | 0.377343                             | 0.000000                   | 0.259190               | 0.215882                    | 0.000000                               | 0.318216              | 0.215882                                  | 0.152590     | 0.948018             |
+| Hulk (2003)                                   | 0.000000                            | 0.857654                             | 0.000000                   | 0.237736               | 0.000000                    | 0.559491                               | 0.000000              | 0.000000                                  | 0.000000     | 0.494611             |
+| Alien: Covenant (2017)                        | 0.000000                            | 0.543434                             | 0.000000                   | 0.423940               | 0.000000                    | 0.920367                               | 0.000000              | 0.000000                                  | 0.423513     | 0.194642             |
+| Ride Along 2 (2016)                           | 0.000000                            | 0.000000                             | 0.276024                   | 0.443588               | 0.433301                    | 0.000000                               | 0.000000              | 0.433301                                  | 0.000000     | 0.401953             |
+| Spellbound (1945)                             | 0.000000                            | 0.000000                             | 0.000000                   | 0.263009               | 0.000000                    | 0.203445                               | 0.000000              | 0.000000                                  | 0.000000     | 0.000000             |
 
-Dari tabel di tersebut, dapat disimpulkan bahwa "They Call Me Trinity (1971)" memiliki kemiripan sangat tinggi dengan "House Party 3 (1994)", ditunjukkan dengan nilai similarity sebesar 1.0. Nilai-nilai inilah yang menjadi dasar dalam sistem rekomendasi: ketika seorang pengguna menyukai satu film, sistem akan merekomendasikan film lain yang memiliki nilai kemiripan tertinggi berdasarkan hasil cosine similarity.
+Dari tabel di tersebut, dapat disimpulkan bahwa "Seeker: The Dark Is Rising, The (2007)" memiliki kemiripan sangat tinggi dengan "	Dragonslayer (1981)", ditunjukkan dengan nilai similarity sebesar 0.948018. Nilai-nilai inilah yang menjadi dasar dalam sistem rekomendasi: ketika seorang pengguna menyukai satu film, sistem akan merekomendasikan film lain yang memiliki nilai kemiripan tertinggi berdasarkan hasil cosine similarity.
 
 Bagaimana Algoritma Bekerja:
 - Content-Based Filtering menggunakan model dari item itu sendiri untuk memberikan rekomendasi. Algoritma ini bekerja dengan cara mengubah fitur deskriptif item (model) menjadi representasi numerik menggunakan TF-IDF Vectorizer. Kemudian, cosine similarity dihitung untuk menentukan seberapa mirip item-item tersebut berdasarkan vektor fitur mereka. Berdasarkan kemiripan ini, sistem dapat merekomendasikan item yang paling mirip dengan item yang sudah disukai pengguna.
@@ -346,15 +346,15 @@ Pada bagian ini, akan mengevaluasi model rekomendasi yang telah dibangun menggun
 
 ### Evaluasi Content-Based Filtering
 
-Metrik evaluasi yang digunakan untuk **Content Based Filtering** adalah **Recall@K**.
+Metrik evaluasi yang digunakan untuk **Content Based Filtering** adalah **Precision@K**.
 
-**Recall@K** adalah metrik yang mengukur proporsi dari item yang relevan di top-K dari keseluruhan item relevan di top-N rekomendasi.
+Precision@K mengukur sejauh mana sistem memberikan rekomendasi yang relevan dalam K item teratas (top-K). Fokus dari metrik ini adalah menghindari item yang tidak relevan, sehingga cocok untuk sistem berbasis konten yang mengutamakan kesamaan karakteristik (seperti genre).
 
-Formula dari Recall@K adalah:
+Formula dari Precision@K adalah:
 
-Recall@K = $\displaystyle \frac{\text{item yang relevan di top-K}}{\text{item yang relevan di top-N}}$
+Precision@K = $\displaystyle \frac{\text{Jumlah item yang relevan di top-K rekomendasi}}{\text{K}}$
 
-Berikut analisa Recall@K untuk hasil rekomendasi **Content-Based Filtering**.
+Berikut analisa Precision@K untuk hasil rekomendasi **Content-Based Filtering**.
 
 Data untuk uji coba
 | # | title | genres |
@@ -365,28 +365,17 @@ Hasil rekomendasi:
 | title                                               | genres                        |
 |-----------------------------------------------------|-------------------------------|
 | Rocketeer, The (1991)                               | [Action, Adventure, Sci-Fi]  |
-| Ant-Man (2015)                                      | [Action, Adventure, Sci-Fi]  |
-| Time Machine, The (2002)                            | [Action, Adventure, Sci-Fi]  |
-| Iron Man (2008)                                     | [Action, Adventure, Sci-Fi]  |
 | Sky Captain and the World of Tomorrow (2004)        | [Action, Adventure, Sci-Fi]  |
 | Star Wars: Episode VI - Return of the Jedi (1983)   | [Action, Adventure, Sci-Fi]  |
 | Justice League (2017)                               | [Action, Adventure, Sci-Fi]  |
-| Farscape: The Peacekeeper Wars (2004)               | [Action, Adventure, Sci-Fi]  |
-| Power/Rangers (2015)                                | [Action, Adventure, Sci-Fi]  |
-| Black Panther (2017)                                | [Action, Adventure, Sci-Fi]  |
+| Ant-Man (2015)                                      | [Action, Adventure, Sci-Fi]  |
 
-Seperti di tabel, semua anime memiliki ketiga genre di data uji coba yaitu **"Action, Adventure, Sci-Fi"**. Hal ini menjadikan jumlah item yang relevan di top-N = 10. maka dapat disimpulkan juga untuk jumlah item di top-K akan selalu sama dengan K.
+Semua rekomendasi memiliki genre yang relevan (mengandung setidaknya satu genre yang sama dengan film input). Oleh karena itu, jumlah item relevan di top-5 adalah 5 dari 5 item yang direkomendasikan. Maka:
+Precision@K = 
+\[
+\frac{\text{Jumlah item yang relevan di top-K rekomendasi}}{K} = \frac{5}{5} = 1.00 \text{ atau } 100\%
+\]
 
-Karena hasil rekomendasi relevan semua, maka:
-
-| K  | Item relevan di Top-K | Recall\@K         |
-| -- | --------------------- | ----------------- |
-| 1  | 1                     | 1 / 10 = **0.1**  |
-| 3  | 3                     | 3 / 10 = **0.3**  |
-| 5  | 5                     | 5 / 10 = **0.5**  |
-| 10 | 10                    | 10 / 10 = **1.0** |
-
-Dapat disimpulkan bahwa rekomendasi yang diberikan memiliki Recall@K sebesar 100%.
 
 
 #### Evaluasi Collaborative Filtering**
