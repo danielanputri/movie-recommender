@@ -382,11 +382,11 @@ MAE atau Mean Absolute Error diterapkan dengan cara mengukur rata-rata dari seli
 MAE = $\displaystyle \sum\frac{|y_i - \hat{y}_i|}{n}$
 
 Dimana:
-MAE = nilai Mean Absolute Error
-y = nilai aktual
-ŷ = nilai prediksi
-i = urutan data
-n = jumlah data
+- MAE = nilai Mean Absolute Error
+- y = nilai aktual
+- ŷ = nilai prediksi
+- i = urutan data
+- n = jumlah data
 
 Root Mean Square Error (RMSE) adalah metrik yang digunakan untuk mengukur seberapa besar selisih (atau kesalahan) antara nilai yang diprediksi oleh sebuah model dengan nilai aktual. RMSE sangat populer karena memberikan bobot yang lebih besar pada kesalahan yang lebih besar.
 
